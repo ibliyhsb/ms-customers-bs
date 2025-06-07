@@ -13,26 +13,26 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import cl.duoc.ms_customers_bs.model.dto.CustomerDto;
 
-@FeignClient(name = "ms-customers-db", url = "http://localhost:8080/api/customers")
+@FeignClient(name = "ms-customers-db", url = "http://localhost:8080")
 
 public interface CustomersDbFeignClient {
 
-    @GetMapping("/authenticate/{username}/{password}")
-    public boolean authenticateCustomerer (@PathVariable("username") String username, @PathVariable("password") String password);
+    @GetMapping("/api/customers/authenticate/{username}/{password}")
+    public boolean authenticateCustomer (@PathVariable("username") String username, @PathVariable("password") String password);
 
-    @GetMapping()
+    @GetMapping("/api/customers")
     public ResponseEntity<List<CustomerDto>> selectAllCustomer();
 
-    @GetMapping("/GetCustomerById/{idCustomer}")
-    public CustomerDto getCustomerById(@PathVariable("idCustomer") Long idCustomer);
+    @GetMapping("/api/customers/GetCustomerById/{idCustomer}")
+    public ResponseEntity<CustomerDto> getCustomerById(@PathVariable("idCustomer") Long idCustomer);
 
-    @PostMapping()
+    @PostMapping("/api/customers")
     public ResponseEntity<String> insertCustomer(@RequestBody CustomerDto customerDto);
 
-    @DeleteMapping("/DeleteCustomerById/{idCustomer}")
+    @DeleteMapping("/api/customers/DeleteCustomerById/{idCustomer}")
     public ResponseEntity<String> deleteCustomer(@PathVariable("idCustomer") Long idCustomer);
     
     
-    @PutMapping("/UpdateCustomer")
+    @PutMapping("/api/customers/UpdateCustomer")
     public ResponseEntity<String> updateCustomer(@RequestBody CustomerDto customerDto);
 }

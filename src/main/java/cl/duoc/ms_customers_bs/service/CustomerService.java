@@ -16,11 +16,11 @@ public class CustomerService {
 @Autowired
 CustomersDbFeignClient customersDbFeignClient;
 
-public CustomerDto getCustomerById(Long idCustomer){
+public ResponseEntity<CustomerDto> getCustomerById(Long idCustomer){
+    CustomerDto customerDto = customersDbFeignClient.getCustomerById(idCustomer).getBody();
 
-    CustomerDto customerDto = customersDbFeignClient.getCustomerById(idCustomer);
-
-    return customerDto;
+    return (customerDto!=null)? new ResponseEntity<>(customerDto, HttpStatus.OK) :
+                                new ResponseEntity<>(HttpStatus.NOT_FOUND);
 }
 
 public ResponseEntity<List<CustomerDto>> selectAllCustomer(){
@@ -30,24 +30,23 @@ public ResponseEntity<List<CustomerDto>> selectAllCustomer(){
                                        new ResponseEntity<>(HttpStatus.NOT_FOUND);
 }
 
-public boolean authenticateCustomerer(String username, String password){
-    
-    return customersDbFeignClient.authenticateCustomerer(username, password);
 
+public boolean authenticateCustomer(String username, String password){    
+    return customersDbFeignClient.authenticateCustomer(username, password);
 }
 
-public ResponseEntity<String> insertCustomer(CustomerDto customerDto){
 
+public ResponseEntity<String> insertCustomer(CustomerDto customerDto){
     return customersDbFeignClient.insertCustomer(customerDto);
 }
 
+
 public ResponseEntity<String> deleteCustomer(Long idCustomer){
-    
     return customersDbFeignClient.deleteCustomer(idCustomer);
 }
 
+
 public ResponseEntity<String> updateCustomer(CustomerDto customerDto){
-    
     return customersDbFeignClient.updateCustomer(customerDto);
 }
 
