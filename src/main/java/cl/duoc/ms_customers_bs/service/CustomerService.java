@@ -16,11 +16,30 @@ public class CustomerService {
 @Autowired
 CustomersDbFeignClient customersDbFeignClient;
 
-public ResponseEntity<CustomerDto> getCustomerById(Long idCustomer){
+public ResponseEntity<String> getCustomerById(Long idCustomer){
     CustomerDto customerDto = customersDbFeignClient.getCustomerById(idCustomer).getBody();
 
-    return (customerDto!=null)? new ResponseEntity<>(customerDto, HttpStatus.OK) :
-                                new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    if (customerDto==null){
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("This ID does not exist");
+    }
+
+    return ResponseEntity.ok("ID Customer: " 
+                              + customerDto.getIdCustomer()
+                              + "\n"
+                              + "Username: " 
+                              + customerDto.getUsername() 
+                              + "\n" 
+                              + "Password: " 
+                              + customerDto.getPassword() 
+                              + "\n" 
+                              + "Name: " 
+                              +  customerDto.getName() 
+                              + "\n" 
+                              + "Last name: " 
+                              + customerDto.getLastName() 
+                              +  "\n" 
+                              + "Email: " 
+                              + customerDto.getEmail());
 }
 
 public ResponseEntity<List<CustomerDto>> selectAllCustomer(){

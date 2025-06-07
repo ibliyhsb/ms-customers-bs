@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import cl.duoc.ms_customers_bs.model.dto.CustomerDto;
 import cl.duoc.ms_customers_bs.service.CustomerService;
+import feign.FeignException.FeignClientException;
 
 @RestController
 @RequestMapping("/api/customers")
@@ -24,9 +25,8 @@ public class CustomerController {
     CustomerService customerService;
 
     @GetMapping("/GetCustomerById/{idCustomer}")
-    public ResponseEntity<CustomerDto> getCustomerById(@PathVariable("idCustomer") Long idCustomer){
-        ResponseEntity<CustomerDto> customerDto = customerService.getCustomerById(idCustomer);
-    return customerDto;
+    public ResponseEntity<String> getCustomerById(@PathVariable("idCustomer") Long idCustomer){
+    return customerService.getCustomerById(idCustomer);
 
 }
 
@@ -44,16 +44,29 @@ public class CustomerController {
 
     @PostMapping()
     public ResponseEntity<String> insertCustomer(@RequestBody CustomerDto customerDto){
-        return customerService.insertCustomer(customerDto);
+        try{
+        return customerService.insertCustomer(customerDto);}
+        catch(FeignClientException feignClientException){
+            return ResponseEntity.status(feignClientException.status()).body(feignClientException.contentUTF8());
+        }
     }
 
     @DeleteMapping("/DeleteCustomerById/{idCustomer}")
     public ResponseEntity<String> deleteCustomer(@PathVariable("idCustomer") Long idCustomer){
-        return customerService.deleteCustomer(idCustomer);
+        try{
+        return customerService.deleteCustomer(idCustomer);}
+        catch(FeignClientException feignClientException){
+            return ResponseEntity.status(feignClientException.status()).body(feignClientException.contentUTF8());
+
+        }
     }
 
     @PutMapping("/UpdateCustomer")
     public ResponseEntity<String> updateCustomer(@RequestBody CustomerDto customerDto){
-        return customerService.updateCustomer(customerDto);
+        try{
+        return customerService.updateCustomer(customerDto);}
+        catch(FeignClientException feignClientException){
+            return ResponseEntity.status(feignClientException.status()).body(feignClientException.contentUTF8());
+        }
     }
 }
