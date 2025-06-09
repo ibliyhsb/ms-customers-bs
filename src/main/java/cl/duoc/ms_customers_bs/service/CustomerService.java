@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import cl.duoc.ms_customers_bs.clients.CustomersDbFeignClient;
 import cl.duoc.ms_customers_bs.model.dto.CustomerDto;
+import feign.FeignException;
 
 @Service
 public class CustomerService {
@@ -16,30 +17,21 @@ public class CustomerService {
 @Autowired
 CustomersDbFeignClient customersDbFeignClient;
 
-public ResponseEntity<String> getCustomerById(Long idCustomer){
-    CustomerDto customerDto = customersDbFeignClient.getCustomerById(idCustomer).getBody();
+public ResponseEntity<?> getCustomerById(Long idCustomer) {
+    try {
+        ResponseEntity<CustomerDto> response = customersDbFeignClient.getCustomerById(idCustomer);
 
-    if (customerDto==null){
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("This ID does not exist");
+        if (response.getBody()==null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("This customer does not exist");
+        }
+
+        else {
+        return response;
+        }
+
+  } catch (FeignException feignException) {
+        return ResponseEntity.status(feignException.status()).body(feignException.contentUTF8());
     }
-
-    return ResponseEntity.ok("ID Customer: " 
-                              + customerDto.getIdCustomer()
-                              + "\n"
-                              + "Username: " 
-                              + customerDto.getUsername() 
-                              + "\n" 
-                              + "Password: " 
-                              + customerDto.getPassword() 
-                              + "\n" 
-                              + "Name: " 
-                              +  customerDto.getName() 
-                              + "\n" 
-                              + "Last name: " 
-                              + customerDto.getLastName() 
-                              +  "\n" 
-                              + "Email: " 
-                              + customerDto.getEmail());
 }
 
 public ResponseEntity<List<CustomerDto>> selectAllCustomer(){
