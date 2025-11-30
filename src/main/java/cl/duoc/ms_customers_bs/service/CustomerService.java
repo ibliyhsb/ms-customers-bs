@@ -5,10 +5,14 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import cl.duoc.ms_customers_bs.clients.CustomersDbFeignClient;
 import cl.duoc.ms_customers_bs.model.dto.CustomerDto;
+import cl.duoc.ms_customers_bs.security.CustomUserDetails;
 import feign.FeignException;
 
 @Service
@@ -25,9 +29,13 @@ public ResponseEntity<?> getCustomerById(Long idCustomer) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("This customer does not exist");
         }
 
-        else {
-        return response;
+        CustomerDto customer = response.getBody();
+        
+        if (!isAdmin() && !isOwnData(customer.getUsername())) {
+            throw new AccessDeniedException("Users can only access their own data");
         }
+
+        return response;
 
   } catch (FeignException feignException) {
         return ResponseEntity.status(feignException.status()).body(feignException.contentUTF8());
@@ -58,7 +66,29 @@ public ResponseEntity<String> deleteCustomer(Long idCustomer){
 
 
 public ResponseEntity<String> updateCustomer(CustomerDto customerDto){
+    if (!isAdmin() && !isOwnData(customerDto.getUsername())) {
+        throw new AccessDeniedException("Users can only update their own data");
+    }
     return customersDbFeignClient.updateCustomer(customerDto);
+}
+
+private String getCurrentUsername() {
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    if (auth != null && auth.getPrincipal() instanceof CustomUserDetails) {
+        return ((CustomUserDetails) auth.getPrincipal()).getUsername();
+    }
+    return auth != null ? auth.getName() : null;
+}
+
+private boolean isAdmin() {
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    return auth != null && auth.getAuthorities().stream()
+            .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+}
+
+private boolean isOwnData(String resourceUsername) {
+    String currentUsername = getCurrentUsername();
+    return currentUsername != null && currentUsername.equals(resourceUsername);
 }
 
 }

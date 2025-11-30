@@ -11,9 +11,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import cl.duoc.ms_customers_bs.config.FeignClientInterceptor;
 import cl.duoc.ms_customers_bs.model.dto.CustomerDto;
 
-@FeignClient(name = "ms-customers-db", url = "http://localhost:8080")
+@FeignClient(name = "ms-customers-db", url = "http://localhost:8080", configuration = FeignClientInterceptor.class)
 
 public interface CustomersDbFeignClient {
 
@@ -35,4 +36,7 @@ public interface CustomersDbFeignClient {
     
     @PutMapping("/api/customers/UpdateCustomer")
     public ResponseEntity<String> updateCustomer(@RequestBody CustomerDto customerDto);
+
+    @GetMapping("/api/customers/GetCustomerByUsername/{username}")
+    public ResponseEntity<CustomerDto> getCustomerByUsername(@PathVariable("username") String username);
 }

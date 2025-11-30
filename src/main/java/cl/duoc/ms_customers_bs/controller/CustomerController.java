@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,12 +26,14 @@ public class CustomerController {
     CustomerService customerService;
 
     @GetMapping("/GetCustomerById/{idCustomer}")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<?> getCustomerById(@PathVariable("idCustomer") Long idCustomer){
     return customerService.getCustomerById(idCustomer);
 
 }
 
     @GetMapping()
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<CustomerDto>> selectAllCustomers(){
         ResponseEntity<List<CustomerDto>> listaCustomerDto = customerService.selectAllCustomer();
 
@@ -38,11 +41,13 @@ public class CustomerController {
     }
 
     @GetMapping("/authenticate/{username}/{password}")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public boolean authenticateCustomer(@PathVariable("username") String username, @PathVariable("password") String password){
         return customerService.authenticateCustomer(username, password);
     }
 
     @PostMapping()
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> insertCustomer(@RequestBody CustomerDto customerDto){
         try{
         return customerService.insertCustomer(customerDto);}
@@ -52,6 +57,7 @@ public class CustomerController {
     }
 
     @DeleteMapping("/DeleteCustomerById/{idCustomer}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteCustomer(@PathVariable("idCustomer") Long idCustomer){
         try{
         return customerService.deleteCustomer(idCustomer);}
@@ -62,6 +68,7 @@ public class CustomerController {
     }
 
     @PutMapping("/UpdateCustomer")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<String> updateCustomer(@RequestBody CustomerDto customerDto){
         try{
         return customerService.updateCustomer(customerDto);}

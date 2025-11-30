@@ -15,7 +15,9 @@ import cl.duoc.ms_customers_bs.service.CustomerService;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -35,7 +37,9 @@ class CustomerControllerTest {
 
     @Test
     void insertCustomer(){
-        CustomerDto customerDto = new CustomerDto(1L, "catdrojas", "12345", "Catalina", "Rojas", "catd.rojas@duocuc.cl");
+        Set<String> roles = new HashSet<>();
+        roles.add("ROLE_USER");
+        CustomerDto customerDto = new CustomerDto(1L, "catdrojas", "12345", "Catalina", "Rojas", "catd.rojas@duocuc.cl", roles);
         ResponseEntity<String> expectedResponse = ResponseEntity.ok("Customer created.");
 
         when(customerService.insertCustomer(customerDto)).thenReturn(expectedResponse);
@@ -48,7 +52,9 @@ class CustomerControllerTest {
 
     @Test
     void getCustomerById(){
-        CustomerDto customerDto = new CustomerDto(1L, "catdrojas", "12345", "Catalina", "Rojas", "catd.rojas@duocuc.cl");
+        Set<String> roles = new HashSet<>();
+        roles.add("ROLE_USER");
+        CustomerDto customerDto = new CustomerDto(1L, "catdrojas", "12345", "Catalina", "Rojas", "catd.rojas@duocuc.cl", roles);
         ResponseEntity<?> expectedResponse = ResponseEntity.ok().body(customerDto);    
 
         when(customerService.getCustomerById(customerDto.getIdCustomer())).thenReturn((ResponseEntity)expectedResponse);
@@ -60,8 +66,10 @@ class CustomerControllerTest {
 
     @Test
     void selectAllCustomer(){
-        CustomerDto customerDto1 = new CustomerDto(1L, "catdrojas", "12345", "Catalina", "Rojas", "catd.rojas@duocuc.cl");
-        CustomerDto customerDto2 = new CustomerDto(2L, "alfaguas", "43434", "Alejandra", "Faguas", "alfaguas@duocuc.cl");
+        Set<String> roles = new HashSet<>();
+        roles.add("ROLE_USER");
+        CustomerDto customerDto1 = new CustomerDto(1L, "catdrojas", "12345", "Catalina", "Rojas", "catd.rojas@duocuc.cl", roles);
+        CustomerDto customerDto2 = new CustomerDto(2L, "alfaguas", "43434", "Alejandra", "Faguas", "alfaguas@duocuc.cl", roles);
         
         List<CustomerDto> listaCustomerDto = new ArrayList<>();
 
