@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import cl.duoc.ms_customers_bs.model.dto.AuthenticationRequest;
 import cl.duoc.ms_customers_bs.model.dto.CustomerDto;
 import cl.duoc.ms_customers_bs.service.CustomerService;
 import feign.FeignException.FeignClientException;
@@ -40,10 +41,21 @@ public class CustomerController {
         return listaCustomerDto;
     }
 
+    /**
+     * @deprecated Use POST /api/customers/authenticate with request body instead.
+     * This endpoint exposes credentials in URL which is a security risk.
+     */
+    @Deprecated
     @GetMapping("/authenticate/{username}/{password}")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public boolean authenticateCustomer(@PathVariable("username") String username, @PathVariable("password") String password){
+    public boolean authenticateCustomerLegacy(@PathVariable("username") String username, @PathVariable("password") String password){
         return customerService.authenticateCustomer(username, password);
+    }
+
+    @PostMapping("/authenticate")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    public boolean authenticateCustomer(@RequestBody AuthenticationRequest request){
+        return customerService.authenticateCustomer(request.getUsername(), request.getPassword());
     }
 
     @PostMapping()
