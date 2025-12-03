@@ -57,7 +57,7 @@ class CustomerControllerTest {
         CustomerDto customerDto = new CustomerDto(1L, "catdrojas", "12345", "Catalina", "Rojas", "catd.rojas@duocuc.cl", roles);
         ResponseEntity<?> expectedResponse = ResponseEntity.ok().body(customerDto);    
 
-        when(customerService.getCustomerById(customerDto.getIdCustomer())).thenReturn((ResponseEntity)expectedResponse);
+        when(customerService.getCustomerById(customerDto.getIdCustomer())).thenAnswer(invocation -> expectedResponse);
 
         ResponseEntity<?> actualResponse = customerController.getCustomerById(customerDto.getIdCustomer());
 
