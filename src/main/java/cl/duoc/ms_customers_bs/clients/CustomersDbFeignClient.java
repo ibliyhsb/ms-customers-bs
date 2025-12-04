@@ -18,8 +18,8 @@ import cl.duoc.ms_customers_bs.model.dto.CustomerDto;
 
 public interface CustomersDbFeignClient {
 
-    @GetMapping("/api/customers/authenticate/{username}/{password}")
-    public boolean authenticateCustomer (@PathVariable("username") String username, @PathVariable("password") String password);
+    @GetMapping("/api/customers/authenticate/{email}/{password}")
+    public boolean authenticateCustomer (@PathVariable("email") String email, @PathVariable("password") String password);
 
     @GetMapping("/api/customers")
     public ResponseEntity<List<CustomerDto>> selectAllCustomer();
@@ -37,6 +37,6 @@ public interface CustomersDbFeignClient {
     @PutMapping("/api/customers/UpdateCustomer")
     public ResponseEntity<String> updateCustomer(@RequestBody CustomerDto customerDto);
 
-    @GetMapping("/api/customers/GetCustomerByUsername/{username}")
-    public ResponseEntity<CustomerDto> getCustomerByUsername(@PathVariable("username") String username);
+    @GetMapping("/api/customers/GetCustomerByEmail/{email}")
+    public ResponseEntity<CustomerDto> getCustomerByEmail(@PathVariable("email") String email);
 }

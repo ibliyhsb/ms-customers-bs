@@ -8,12 +8,12 @@ import java.util.Set;
 
 public class CustomUserDetails implements UserDetails {
 
-    private final String username;
+    private final String email;
     private final Long userId;
     private final Set<? extends GrantedAuthority> authorities;
 
-    public CustomUserDetails(String username, Long userId, Set<? extends GrantedAuthority> authorities) {
-        this.username = username;
+    public CustomUserDetails(String email, Long userId, Set<? extends GrantedAuthority> authorities) {
+        this.email = email;
         this.userId = userId;
         this.authorities = authorities;
     }
@@ -34,7 +34,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return username;
+        return email;
     }
 
     @Override

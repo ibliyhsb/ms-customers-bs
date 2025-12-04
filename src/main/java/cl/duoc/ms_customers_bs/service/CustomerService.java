@@ -31,7 +31,7 @@ public ResponseEntity<?> getCustomerById(Long idCustomer) {
 
         CustomerDto customer = response.getBody();
         
-        if (!isAdmin() && !isOwnData(customer.getUsername())) {
+        if (!isAdmin() && customer.getEmail() != null && !isOwnData(customer.getEmail())) {
             throw new AccessDeniedException("Users can only access their own data");
         }
 
@@ -50,10 +50,30 @@ public ResponseEntity<List<CustomerDto>> selectAllCustomer(){
 }
 
 
-public boolean authenticateCustomer(String username, String password){    
-    return customersDbFeignClient.authenticateCustomer(username, password);
+public boolean authenticateCustomer(String email, String password){    
+    return customersDbFeignClient.authenticateCustomer(email, password);
 }
 
+public ResponseEntity<?> getCustomerByEmail(String email) {
+    try {
+        ResponseEntity<CustomerDto> response = customersDbFeignClient.getCustomerByEmail(email);
+
+        if (response.getBody()==null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Customer not found with email: " + email);
+        }
+
+        CustomerDto customer = response.getBody();
+        
+        if (!isAdmin() && customer.getEmail() != null && !isOwnData(customer.getEmail())) {
+            throw new AccessDeniedException("Users can only access their own data");
+        }
+
+        return response;
+
+    } catch (FeignException feignException) {
+        return ResponseEntity.status(feignException.status()).body(feignException.contentUTF8());
+    }
+}
 
 public ResponseEntity<String> insertCustomer(CustomerDto customerDto){
     return customersDbFeignClient.insertCustomer(customerDto);
@@ -66,13 +86,13 @@ public ResponseEntity<String> deleteCustomer(Long idCustomer){
 
 
 public ResponseEntity<String> updateCustomer(CustomerDto customerDto){
-    if (!isAdmin() && !isOwnData(customerDto.getUsername())) {
+    if (!isAdmin() && customerDto.getEmail() != null && !isOwnData(customerDto.getEmail())) {
         throw new AccessDeniedException("Users can only update their own data");
     }
     return customersDbFeignClient.updateCustomer(customerDto);
 }
 
-private String getCurrentUsername() {
+private String getCurrentEmail() {
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
     if (auth != null && auth.getPrincipal() instanceof CustomUserDetails) {
         return ((CustomUserDetails) auth.getPrincipal()).getUsername();
@@ -86,9 +106,9 @@ private boolean isAdmin() {
             .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
 }
 
-private boolean isOwnData(String resourceUsername) {
-    String currentUsername = getCurrentUsername();
-    return currentUsername != null && currentUsername.equals(resourceUsername);
+private boolean isOwnData(String resourceEmail) {
+    String currentEmail = getCurrentEmail();
+    return currentEmail != null && currentEmail.equals(resourceEmail);
 }
 
 }

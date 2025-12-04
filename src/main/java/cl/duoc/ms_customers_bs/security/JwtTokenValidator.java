@@ -39,7 +39,7 @@ public class JwtTokenValidator {
         }
     }
 
-    public String getUsernameFromToken(String token) {
+    public String getEmailFromToken(String token) {
         Claims claims = getClaims(token);
         return claims.getSubject();
     }

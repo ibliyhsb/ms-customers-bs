@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import cl.duoc.ms_customers_bs.model.dto.AuthenticationRequest;
+import cl.duoc.ms_customers_bs.model.dto.AuthenticationResponse;
 import cl.duoc.ms_customers_bs.model.dto.CustomerDto;
+import cl.duoc.ms_customers_bs.service.AuthenticationService;
 import cl.duoc.ms_customers_bs.service.CustomerService;
 import feign.FeignException.FeignClientException;
 
@@ -25,6 +27,9 @@ public class CustomerController {
  
     @Autowired
     CustomerService customerService;
+
+    @Autowired
+    AuthenticationService authenticationService;
 
     @GetMapping("/GetCustomerById/{idCustomer}")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
@@ -41,28 +46,53 @@ public class CustomerController {
         return listaCustomerDto;
     }
 
+    @PostMapping("/login")
+    public ResponseEntity<AuthenticationResponse> login(@RequestBody AuthenticationRequest request){
+        AuthenticationResponse response = authenticationService.login(request.getEmail(), request.getPassword());
+        
+        if (response.getToken() == null) {
+            return ResponseEntity.status(401).body(response);
+        }
+        
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/authenticate/{email}/{password}")
+    public boolean authenticateCustomerPost(@PathVariable("email") String email, @PathVariable("password") String password){
+        return customerService.authenticateCustomer(email, password);
+    }
+
     /**
-     * @deprecated Use POST /api/customers/authenticate with request body instead.
+     * @deprecated Use POST /api/customers/login with request body instead.
      * This endpoint exposes credentials in URL which is a security risk.
      */
     @Deprecated
-    @GetMapping("/authenticate/{username}/{password}")
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public boolean authenticateCustomerLegacy(@PathVariable("username") String username, @PathVariable("password") String password){
-        return customerService.authenticateCustomer(username, password);
+    @GetMapping("/authenticate/{email}/{password}")
+    public boolean authenticateCustomerLegacy(@PathVariable("email") String email, @PathVariable("password") String password){
+        return customerService.authenticateCustomer(email, password);
     }
 
     @PostMapping("/authenticate")
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public boolean authenticateCustomer(@RequestBody AuthenticationRequest request){
-        return customerService.authenticateCustomer(request.getUsername(), request.getPassword());
+        return customerService.authenticateCustomer(request.getEmail(), request.getPassword());
+    }
+
+    @GetMapping("/GetCustomerByEmail/{email}")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    public ResponseEntity<?> getCustomerByEmail(@PathVariable("email") String email){
+        try{
+            return customerService.getCustomerByEmail(email);
+        }
+        catch(FeignClientException feignClientException){
+            return ResponseEntity.status(feignClientException.status()).body(feignClientException.contentUTF8());
+        }
     }
 
     @PostMapping()
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> insertCustomer(@RequestBody CustomerDto customerDto){
         try{
-        return customerService.insertCustomer(customerDto);}
+            return customerService.insertCustomer(customerDto);
+        }
         catch(FeignClientException feignClientException){
             return ResponseEntity.status(feignClientException.status()).body(feignClientException.contentUTF8());
         }

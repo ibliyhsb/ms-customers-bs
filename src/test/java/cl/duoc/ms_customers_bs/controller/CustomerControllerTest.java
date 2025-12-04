@@ -39,7 +39,7 @@ class CustomerControllerTest {
     void insertCustomer(){
         Set<String> roles = new HashSet<>();
         roles.add("ROLE_USER");
-        CustomerDto customerDto = new CustomerDto(1L, "catdrojas", "12345", "Catalina", "Rojas", "catd.rojas@duocuc.cl", roles);
+        CustomerDto customerDto = new CustomerDto(1L, "12345", "Catalina", "Rojas", "catd.rojas@duocuc.cl", roles);
         ResponseEntity<String> expectedResponse = ResponseEntity.ok("Customer created.");
 
         when(customerService.insertCustomer(customerDto)).thenReturn(expectedResponse);
@@ -54,7 +54,7 @@ class CustomerControllerTest {
     void getCustomerById(){
         Set<String> roles = new HashSet<>();
         roles.add("ROLE_USER");
-        CustomerDto customerDto = new CustomerDto(1L, "catdrojas", "12345", "Catalina", "Rojas", "catd.rojas@duocuc.cl", roles);
+        CustomerDto customerDto = new CustomerDto(1L, "12345", "Catalina", "Rojas", "catd.rojas@duocuc.cl", roles);
         ResponseEntity<?> expectedResponse = ResponseEntity.ok().body(customerDto);    
 
         when(customerService.getCustomerById(customerDto.getIdCustomer())).thenAnswer(invocation -> expectedResponse);
@@ -68,8 +68,8 @@ class CustomerControllerTest {
     void selectAllCustomer(){
         Set<String> roles = new HashSet<>();
         roles.add("ROLE_USER");
-        CustomerDto customerDto1 = new CustomerDto(1L, "catdrojas", "12345", "Catalina", "Rojas", "catd.rojas@duocuc.cl", roles);
-        CustomerDto customerDto2 = new CustomerDto(2L, "alfaguas", "43434", "Alejandra", "Faguas", "alfaguas@duocuc.cl", roles);
+        CustomerDto customerDto1 = new CustomerDto(1L, "12345", "Catalina", "Rojas", "catd.rojas@duocuc.cl", roles);
+        CustomerDto customerDto2 = new CustomerDto(2L, "43434", "Alejandra", "Faguas", "alfaguas@duocuc.cl", roles);
         
         List<CustomerDto> listaCustomerDto = new ArrayList<>();
 

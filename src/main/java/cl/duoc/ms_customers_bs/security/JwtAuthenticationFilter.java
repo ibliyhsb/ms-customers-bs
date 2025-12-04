@@ -41,7 +41,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String token = authHeader.substring(BEARER_PREFIX.length());
 
             if (jwtTokenValidator.validateToken(token)) {
-                String username = jwtTokenValidator.getUsernameFromToken(token);
+                String email = jwtTokenValidator.getEmailFromToken(token);
                 Set<String> roles = jwtTokenValidator.getRolesFromToken(token);
                 Long userId = jwtTokenValidator.getUserIdFromToken(token);
 
@@ -49,13 +49,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         .map(role -> new SimpleGrantedAuthority(role.startsWith("ROLE_") ? role : "ROLE_" + role))
                         .collect(Collectors.toSet());
 
-                CustomUserDetails userDetails = new CustomUserDetails(username, userId, authorities);
+                CustomUserDetails userDetails = new CustomUserDetails(email, userId, authorities);
 
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-                logger.debug("Authenticated user: {} with roles: {}", username, roles);
+                logger.debug("Authenticated user: {} with roles: {}", email, roles);
             } else {
                 logger.warn("Invalid JWT token received");
             }
