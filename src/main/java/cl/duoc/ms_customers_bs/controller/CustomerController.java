@@ -20,9 +20,15 @@ import cl.duoc.ms_customers_bs.model.dto.CustomerDto;
 import cl.duoc.ms_customers_bs.service.AuthenticationService;
 import cl.duoc.ms_customers_bs.service.CustomerService;
 import feign.FeignException.FeignClientException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 @RestController
 @RequestMapping("/api/customers")
+@Tag(name = "Customers", description = "API para la gestión de clientes")
 public class CustomerController {
  
     @Autowired
@@ -31,6 +37,12 @@ public class CustomerController {
     @Autowired
     AuthenticationService authenticationService;
 
+    @Operation(summary = "Obtener cliente por ID", security = @SecurityRequirement(name = "bearer-jwt"))
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Cliente encontrado"),
+        @ApiResponse(responseCode = "404", description = "Cliente no encontrado"),
+        @ApiResponse(responseCode = "401", description = "No autorizado")
+    })
     @GetMapping("/GetCustomerById/{idCustomer}")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<?> getCustomerById(@PathVariable("idCustomer") Long idCustomer){
@@ -38,6 +50,11 @@ public class CustomerController {
 
 }
 
+    @Operation(summary = "Obtener todos los clientes (Solo ADMIN)", security = @SecurityRequirement(name = "bearer-jwt"))
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Lista de clientes obtenida"),
+        @ApiResponse(responseCode = "403", description = "Acceso denegado")
+    })
     @GetMapping()
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<CustomerDto>> selectAllCustomers(){
@@ -46,6 +63,11 @@ public class CustomerController {
         return listaCustomerDto;
     }
 
+    @Operation(summary = "Login de usuario", description = "Endpoint público para autenticación")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Login exitoso"),
+        @ApiResponse(responseCode = "401", description = "Credenciales inválidas")
+    })
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> login(@RequestBody AuthenticationRequest request){
         AuthenticationResponse response = authenticationService.login(request.getEmail(), request.getPassword());

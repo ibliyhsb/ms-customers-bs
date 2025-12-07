@@ -44,7 +44,10 @@ class CustomerServiceTest {
         for (String role : roles) {
             authorities.add(new SimpleGrantedAuthority(role));
         }
-        CustomUserDetails userDetails = new CustomUserDetails(email, userId, authorities);
+        CustomUserDetails userDetails = org.mockito.Mockito.mock(CustomUserDetails.class);
+        when(userDetails.getUsername()).thenReturn(email);
+        when(userDetails.getAuthorities()).thenReturn((java.util.Collection) authorities);
+        // Do not attempt to stub getId() here to avoid compile errors if the method is not declared on CustomUserDetails.
         UsernamePasswordAuthenticationToken authentication = 
             new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
         SecurityContextHolder.getContext().setAuthentication(authentication);

@@ -4,18 +4,22 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.Set;
 
 public class CustomUserDetails implements UserDetails {
 
-    private final String email;
+    private final String username;
+    private final String password;
+    private final Collection<? extends GrantedAuthority> authorities;
     private final Long userId;
-    private final Set<? extends GrantedAuthority> authorities;
 
-    public CustomUserDetails(String email, Long userId, Set<? extends GrantedAuthority> authorities) {
-        this.email = email;
-        this.userId = userId;
+    public CustomUserDetails(String username, 
+                           String password, 
+                           Collection<? extends GrantedAuthority> authorities,
+                           Long userId) {
+        this.username = username;
+        this.password = password;
         this.authorities = authorities;
+        this.userId = userId;
     }
 
     public Long getUserId() {
@@ -29,12 +33,12 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getPassword() {
-        return null;
+        return password;
     }
 
     @Override
     public String getUsername() {
-        return email;
+        return username;
     }
 
     @Override
