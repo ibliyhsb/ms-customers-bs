@@ -10,19 +10,19 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SwaggerConfig {
 
-    @Bean
-    public OpenAPI customOpenAPI() {
-        return new OpenAPI()
-                .info(new Info()
-                        .title("Customers microservice - Business(BS) Documentation")
-                        .version("1.0")
-                        .description("This microservice is responsible for the business logic"))
-                .addSecurityItem(new SecurityRequirement().addList("bearer-jwt"))
-                .components(new Components()
-                        .addSecuritySchemes("bearer-jwt", new SecurityScheme()
-                                .type(SecurityScheme.Type.HTTP)
-                                .scheme("bearer")
-                                .bearerFormat("JWT")
-                                .description("JWT Authorization header using the Bearer scheme")));
-    }
+        @Bean
+        public OpenAPI customOpenAPI() {
+                return new OpenAPI()
+                                .info(new Info()
+                                                .title("Customers microservice - Business(BS) Documentation")
+                                                .version("1.0")
+                                                .description("This microservice is responsible for the business logic"))
+                                .addSecurityItem(new SecurityRequirement().addList("bearer-jwt"))
+                                .components(new Components()
+                                                .addSecuritySchemes("bearer-jwt", new SecurityScheme()
+                                                                .type(SecurityScheme.Type.HTTP)
+                                                                .scheme("bearer")
+                                                                .bearerFormat("JWT")
+                                                                .description("JWT Authorization header using the Bearer scheme")));
+        }
 }
